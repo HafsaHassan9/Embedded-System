@@ -1,0 +1,73 @@
+#include <ESP8266WiFi.h>
+
+const char* ssid = "Your_SSID";      // Replace with your Wi-Fi SSID
+const char* password = "Your_PASSWORD"; // Replace with your Wi-Fi password
+
+WiFiServer server(80);                // Create a server that listens on port 80
+const int ledPin = D1;                // Pin where the LED is connected
+
+void setup() {
+    pinMode(ledPin, OUTPUT);           // Set LED pin as output
+    digitalWrite(ledPin, LOW);         // Initialize LED as OFF
+
+    Serial.begin(115200);
+    WiFi.begin(ssid, password);         // Connect to Wi-Fi
+
+    // Wait for connection
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.println("Connecting to WiFi...");
+    }
+
+    Serial.println("Connected to WiFi");
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+
+    server.begin();                     // Start the server
+}
+
+void loop() {
+    WiFiClient client = server.available(); // Listen for incoming clients
+
+    if (client) {
+        String currentLine = "";           // Create a String to hold incoming data
+        while (client.connected()) {
+            if (client.available()) {
+                char c = client.read();    // Read the client data
+                Serial.write(c);            // Print to Serial Monitor
+                currentLine += c;           // Add the data to the current line
+
+                // If the current line ends with a newline character
+                if (c == '\n') {
+                    // Check if the current line is empty
+                    if (currentLine.length() == 0) {
+                        // Send HTTP response
+                        client.println("HTTP/1.1 200 OK");
+                        client.println("Content-type:text/html");
+                        client.println();
+                        client.println("<html><body>");
+                        client.println("<h1>ESP8266 Web Server</h1>");
+                        client.println("<p>LED Control</p>");
+                        client.println("<a href=\"/LED=ON\"><button>Turn ON</button></a>");
+                        client.println("<a href=\"/LED=OFF\"><button>Turn OFF</button></a>");
+                        client.println("</body></html>");
+
+                        // Check if LED should be turned ON or OFF
+                        if (currentLine.indexOf("GET /LED=ON") >= 0) {
+                            digitalWrite(ledPin, HIGH); // Turn ON LED
+                        }
+                        if (currentLine.indexOf("GET /LED=OFF") >= 0) {
+                            digitalWrite(ledPin, LOW);  // Turn OFF LED
+                        }
+
+                        break; // Break out of the while loop
+                    } else {
+                        currentLine = ""; // Clear the current line
+                    }
+                }
+            }
+        }
+        client.stop(); // Close the connection
+        Serial.println("Client disconnected");
+    }
+}
