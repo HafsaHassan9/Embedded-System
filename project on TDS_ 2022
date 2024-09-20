@@ -1,0 +1,17 @@
+
+const int TdsSensorPin = A0;
+float calibrationFactor = 0.5; 
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  int sensorValue = analogRead(TdsSensorPin);
+  float voltage = sensorValue * (5.0 / 1023.0); 
+  float tdsValue = (133.42 * voltage * voltage * voltage - 255.86 * voltage * voltage + 857.39 * voltage) * calibrationFactor;
+  Serial.print("TDS Value: ");
+  Serial.print(tdsValue);
+  Serial.println(" ppm");
+  
+  delay(1000); 
+}
