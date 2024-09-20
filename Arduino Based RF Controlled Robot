@@ -1,0 +1,77 @@
+#include <VirtualWire.h>
+
+const int motor1A = 3; // Motor 1 direction pin
+const int motor1B = 4; // Motor 1 reverse pin
+const int motor2A = 5; // Motor 2 direction pin
+const int motor2B = 6; // Motor 2 reverse pin
+
+void setup() {
+    Serial.begin(9600);
+    vw_set_rx_pin(2);      // Set the receiver pin
+    vw_setup(2000);        // Bits per second
+    vw_rx_start();         // Start the receiver
+    pinMode(motor1A, OUTPUT);
+    pinMode(motor1B, OUTPUT);
+    pinMode(motor2A, OUTPUT);
+    pinMode(motor2B, OUTPUT);
+}
+
+void loop() {
+    uint8_t buf[3];
+    uint8_t buflen = sizeof(buf);
+
+    if (vw_get_message(buf, &buflen)) {
+        switch (buf[0]) {
+            case 'F': // Forward
+                moveForward();
+                break;
+            case 'B': // Backward
+                moveBackward();
+                break;
+            case 'L': // Left
+                turnLeft();
+                break;
+            case 'R': // Right
+                turnRight();
+                break;
+            case 'S': // Stop
+                stop();
+                break;
+        }
+    }
+}
+
+void moveForward() {
+    digitalWrite(motor1A, HIGH);
+    digitalWrite(motor1B, LOW);
+    digitalWrite(motor2A, HIGH);
+    digitalWrite(motor2B, LOW);
+}
+
+void moveBackward() {
+    digitalWrite(motor1A, LOW);
+    digitalWrite(motor1B, HIGH);
+    digitalWrite(motor2A, LOW);
+    digitalWrite(motor2B, HIGH);
+}
+
+void turnLeft() {
+    digitalWrite(motor1A, LOW);
+    digitalWrite(motor1B, HIGH);
+    digitalWrite(motor2A, HIGH);
+    digitalWrite(motor2B, LOW);
+}
+
+void turnRight() {
+    digitalWrite(motor1A, HIGH);
+    digitalWrite(motor1B, LOW);
+    digitalWrite(motor2A, LOW);
+    digitalWrite(motor2B, HIGH);
+}
+
+void stop() {
+    digitalWrite(motor1A, LOW);
+    digitalWrite(motor1B, LOW);
+    digitalWrite(motor2A, LOW);
+    digitalWrite(motor2B, LOW);
+}
