@@ -1,0 +1,36 @@
+#include <SPI.h>
+#include <RF24.h>
+
+RF24 radio(9, 10); // CE, CSN pins
+
+volatile unsigned long frequencyCount = 0; // Frequency count
+unsigned long lastTime = 0;                 // Last time to calculate frequency
+
+void setup() {
+  Serial.begin(9600);
+  radio.begin();
+  radio.openWritingPipe(0xF0F0F0F0E1LL); // Set the address
+  radio.setPALevel(RF24_PA_HIGH);
+  radio.startListening();
+
+  // Attach an interrupt to pin 2 to count frequency
+  attachInterrupt(digitalPinToInterrupt(2), countFrequency, RISING);
+}
+
+void loop() {
+  // Calculate frequency every second
+  if (millis() - lastTime >= 1000) {
+    lastTime = millis();
+    unsigned long freq = frequencyCount; // Store frequency count
+    frequencyCount = 0; // Reset count
+    radio.stopListening(); // Stop listening to send data
+    radio.write(&freq, sizeof(freq)); // Send frequency data
+    Serial.print("Frequency: ");
+    Serial.println(freq);
+    radio.startListening(); // Start listening again
+  }
+}
+
+void countFrequency() {
+  frequencyCount++; // Increment frequency count on rising edge
+}
