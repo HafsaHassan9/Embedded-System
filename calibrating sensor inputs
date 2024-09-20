@@ -1,0 +1,12 @@
+int sensorMin = 1023;        // minimum sensor value
+int sensorMax = 0;           // maximum sensor value
+while (millis() < 5000) {
+sensorValue = analogRead(sensorPin);
+if (sensorValue > sensorMax) {
+sensorMax = sensorValue;
+}
+if (sensorValue < sensorMin) {
+sensorMin = sensorValue;
+}
+}
+sensorValue = map(sensorValue, sensorMin, sensorMax, 0, 255);
