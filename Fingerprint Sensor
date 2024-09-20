@@ -1,0 +1,47 @@
+#include <Adafruit_Fingerprint.h>
+#include <SoftwareSerial.h>
+
+// Define the software serial pins for RX and TX
+SoftwareSerial mySerial(3, 2); // RX, TX
+Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
+
+void setup() {
+    Serial.begin(57600);  // Set the baud rate for Serial Monitor
+    mySerial.begin(57600); // Set the baud rate for the fingerprint sensor
+
+    Serial.println("Fingerprint sensor initializing...");
+    if (finger.begin()) {
+        Serial.println("Found fingerprint sensor!");
+    } else {
+        Serial.println("Did not find a fingerprint sensor. Please check your connections.");
+        while (1); // Halt the program
+    }
+}
+
+void loop() {
+    Serial.println("Place your finger on the sensor...");
+
+    // Wait for a finger to be detected
+    int fingerID = finger.getImage();
+    if (fingerID == FINGERPRINT_OK) {
+        Serial.println("Finger detected!");
+
+        // Convert the image to a fingerprint template
+        finger.image2Tz();
+        Serial.println("Creating template...");
+
+        // Enroll the fingerprint
+        int result = finger.fingerFastEnroll();
+        if (result == FINGERPRINT_OK) {
+            Serial.println("Fingerprint enrolled successfully!");
+        } else {
+            Serial.print("Error enrolling fingerprint: ");
+            Serial.println(result);
+        }
+    } else {
+        Serial.print("No finger detected. Error: ");
+        Serial.println(fingerID);
+    }
+
+    delay(2000); // Wait before the next read
+}
