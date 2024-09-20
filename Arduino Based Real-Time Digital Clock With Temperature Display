@@ -1,0 +1,72 @@
+#include <Wire.h>
+#include <RTClib.h>
+#include <DHT.h>
+#include <LiquidCrystal.h>
+
+// Initialize RTC
+RTC_DS3231 rtc;
+
+// Initialize DHT sensor
+#define DHTPIN 2       // DHT sensor data pin
+#define DHTTYPE DHT11  // DHT 11
+DHT dht(DHTPIN, DHTTYPE);
+
+// Initialize LCD (optional)
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2); // Adjust pins based on your setup
+
+void setup() {
+  Serial.begin(9600);
+  
+  // Initialize RTC
+  if (!rtc.begin()) {
+    Serial.println("Couldn't find RTC");
+    while (1);
+  }
+
+  // Initialize DHT sensor
+  dht.begin();
+  
+  // Initialize LCD
+  lcd.begin(16, 2);
+  lcd.print("Clock & Temp");
+}
+
+void loop() {
+  // Get current time
+  DateTime now = rtc.now();
+
+  // Read temperature
+  float temperature = dht.readTemperature(); // Celsius
+  if (isnan(temperature)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+
+  // Print time and temperature to Serial Monitor
+  Serial.print("Time: ");
+  Serial.print(now.hour());
+  Serial.print(':');
+  Serial.print(now.minute());
+  Serial.print(':');
+  Serial.print(now.second());
+  Serial.print("  Temperature: ");
+  Serial.print(temperature);
+  Serial.println(" °C");
+
+  // Display time and temperature on LCD
+  lcd.setCursor(0, 0);
+  lcd.print(now.hour());
+  lcd.print(':');
+  if (now.minute() < 10) lcd.print('0'); // leading zero
+  lcd.print(now.minute());
+  lcd.print(':');
+  if (now.second() < 10) lcd.print('0'); // leading zero
+  lcd.print(now.second());
+
+  lcd.setCursor(0, 1);
+  lcd.print("Temp: ");
+  lcd.print(temperature);
+  lcd.print(" C");
+
+  delay(1000); // Update every second
+}
