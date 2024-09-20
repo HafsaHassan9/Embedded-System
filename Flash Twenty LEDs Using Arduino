@@ -1,0 +1,24 @@
+// Define LED pin numbers
+const int ledCount = 20;
+const int ledPins[ledCount] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+                                12, 13, A0, A1, A2, A3, A4, A5, A6, A7};
+
+void setup() {
+  // Set all LED pins as OUTPUT
+  for (int i = 0; i < ledCount; i++) {
+    pinMode(ledPins[i], OUTPUT);
+  }
+}
+
+void loop() {
+  // Flash LEDs in sequence
+  for (int i = 0; i < ledCount; i++) {
+    digitalWrite(ledPins[i], HIGH);  // Turn LED on
+    delay(200);                       // Wait for 200 milliseconds
+    digitalWrite(ledPins[i], LOW);   // Turn LED off
+    delay(200);                       // Wait for 200 milliseconds
+  }
+
+  // Optionally, you can add a pause after completing one cycle
+  delay(1000); // Wait for 1 second before starting again
+}
