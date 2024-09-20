@@ -1,0 +1,23 @@
+const int sensorPin = 2; // Pin connected to the magnetic sensor
+const int buzzerPin = 3;  // Pin connected to the buzzer
+const int ledPin = 4;     // Pin connected to the LED
+
+void setup() {
+    pinMode(sensorPin, INPUT_PULLUP); // Set the sensor pin as input
+    pinMode(buzzerPin, OUTPUT);        // Set the buzzer pin as output
+    pinMode(ledPin, OUTPUT);           // Set the LED pin as output
+}
+
+void loop() {
+    int sensorState = digitalRead(sensorPin); // Read the state of the sensor
+
+    // Check if the window is opened
+    if (sensorState == LOW) { // LOW means the circuit is closed (window open)
+        digitalWrite(buzzerPin, HIGH); // Turn on buzzer
+        digitalWrite(ledPin, HIGH);    // Turn on LED
+        delay(1000);                    // Sound for 1 second
+    } else {
+        digitalWrite(buzzerPin, LOW);  // Turn off buzzer
+        digitalWrite(ledPin, LOW);     // Turn off LED
+    }
+}
