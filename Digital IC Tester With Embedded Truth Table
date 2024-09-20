@@ -1,0 +1,33 @@
+// Pin configuration
+const int buttonA = 2; // Input A
+const int buttonB = 3; // Input B
+const int ledOutput = 13; // Output LED
+
+void setup() {
+    pinMode(buttonA, INPUT_PULLUP); // Set button A with pull-up
+    pinMode(buttonB, INPUT_PULLUP); // Set button B with pull-up
+    pinMode(ledOutput, OUTPUT); // Set output LED as output
+    Serial.begin(9600); // Start serial communication
+}
+
+void loop() {
+    // Read button states (LOW when pressed)
+    int stateA = digitalRead(buttonA);
+    int stateB = digitalRead(buttonB);
+
+    // Calculate AND gate output
+    int output = stateA == LOW && stateB == LOW ? HIGH : LOW;
+
+    // Display output on LED
+    digitalWrite(ledOutput, output);
+
+    // Print truth table to Serial Monitor
+    Serial.print("A: ");
+    Serial.print(stateA == LOW ? "1" : "0");
+    Serial.print(" B: ");
+    Serial.print(stateB == LOW ? "1" : "0");
+    Serial.print(" Output: ");
+    Serial.println(output == HIGH ? "1" : "0");
+
+    delay(500); // Small delay for stability
+}
