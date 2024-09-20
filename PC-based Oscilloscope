@@ -1,0 +1,12 @@
+const int signalPin = A0; // Pin where the signal is connected
+
+void setup() {
+    Serial.begin(115200); // Start serial communication at 115200 baud rate
+}
+
+void loop() {
+    int value = analogRead(signalPin); // Read the signal
+    Serial.println(value); // Send the value to the PC
+    delay(10); // Adjust delay as needed for sampling rate
+}
+
