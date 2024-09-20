@@ -1,0 +1,62 @@
+// Define pin connections
+const int VRx = A0;  // Joystick X-axis
+const int VRy = A1;  // Joystick Y-axis
+const int motor1Pin1 = 3; // Motor 1 direction pin 1
+const int motor1Pin2 = 4; // Motor 1 direction pin 2
+const int motor2Pin1 = 5; // Motor 2 direction pin 1
+const int motor2Pin2 = 6; // Motor 2 direction pin 2
+
+void setup() {
+  // Start the Serial Monitor
+  Serial.begin(9600);
+  
+  // Set motor pins as OUTPUT
+  pinMode(motor1Pin1, OUTPUT);
+  pinMode(motor1Pin2, OUTPUT);
+  pinMode(motor2Pin1, OUTPUT);
+  pinMode(motor2Pin2, OUTPUT);
+}
+
+void loop() {
+  // Read joystick values
+  int xValue = analogRead(VRx);
+  int yValue = analogRead(VRy);
+  
+  // Map the joystick values to motor speed
+  int motor1Speed = map(yValue, 0, 1023, -255, 255); // Motor 1 (forward/backward)
+  int motor2Speed = map(xValue, 0, 1023, -255, 255); // Motor 2 (left/right)
+
+  // Control Motor 1
+  if (motor1Speed > 0) {
+    digitalWrite(motor1Pin1, HIGH);
+    digitalWrite(motor1Pin2, LOW);
+    analogWrite(motor1Pin1, motor1Speed);
+  } else if (motor1Speed < 0) {
+    digitalWrite(motor1Pin1, LOW);
+    digitalWrite(motor1Pin2, HIGH);
+    analogWrite(motor1Pin2, -motor1Speed);
+  } else {
+    digitalWrite(motor1Pin1, LOW);
+    digitalWrite(motor1Pin2, LOW);
+  }
+
+  // Control Motor 2
+  if (motor2Speed > 0) {
+    digitalWrite(motor2Pin1, HIGH);
+    digitalWrite(motor2Pin2, LOW);
+    analogWrite(motor2Pin1, motor2Speed);
+  } else if (motor2Speed < 0) {
+    digitalWrite(motor2Pin1, LOW);
+    digitalWrite(motor2Pin2, HIGH);
+    analogWrite(motor2Pin2, -motor2Speed);
+  } else {
+    digitalWrite(motor2Pin1, LOW);
+    digitalWrite(motor2Pin2, LOW);
+  }
+
+  // Print values for debugging
+  Serial.print("X: "); Serial.print(xValue);
+  Serial.print(" Y: "); Serial.println(yValue);
+  
+  delay(100); // Small delay for stability
+}
