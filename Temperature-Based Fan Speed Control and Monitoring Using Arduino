@@ -1,0 +1,30 @@
+const int tempPin = A0;        // Pin connected to the temperature sensor
+const int fanPin = 9;          // Pin to control the transistor for the fan
+
+void setup() {
+    Serial.begin(9600);        // Start the serial communication
+    pinMode(fanPin, OUTPUT);   // Set the fan pin as output
+}
+
+void loop() {
+    float temperature = readTemperature(); // Read temperature
+
+    // Print the temperature to the Serial Monitor
+    Serial.print("Temperature: ");
+    Serial.print(temperature);
+    Serial.println(" °C");
+
+    // Control the fan speed based on temperature
+    int fanSpeed = map(temperature, 25, 40, 0, 255); // Map temperature to PWM
+    fanSpeed = constrain(fanSpeed, 0, 255); // Ensure fan speed is within limits
+    analogWrite(fanPin, fanSpeed); // Set the fan speed
+
+    delay(1000); // Wait for 1 second before the next reading
+}
+
+float readTemperature() {
+    int rawValue = analogRead(tempPin); // Read the raw value from the temperature sensor
+    float voltage = (rawValue / 1023.0) * 5.0; // Convert to voltage
+    float temperature = voltage * 100; // Convert voltage to temperature (for LM35)
+    return temperature; // Return the temperature
+}
