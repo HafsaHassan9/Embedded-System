@@ -1,0 +1,60 @@
+#include <SPI.h>
+#include <SD.h>
+
+const int micPin = A0;      // Microphone analog pin
+const int recordPin = 7;    // Pin for the ISD1820 record
+const int playPin = 6;      // Pin for the ISD1820 play
+const int csPin = 10;       // Chip select pin for SD card
+
+int threshold = 200;         // Noise threshold for recording
+bool recording = false;
+
+void setup() {
+    Serial.begin(9600);
+    
+    // Initialize SD Card
+    if (!SD.begin(csPin)) {
+        Serial.println("SD card initialization failed!");
+        return;
+    }
+    Serial.println("SD card initialized.");
+
+    pinMode(recordPin, OUTPUT);
+    pinMode(playPin, OUTPUT);
+    digitalWrite(recordPin, LOW);
+    digitalWrite(playPin, LOW);
+}
+
+void loop() {
+    int micValue = analogRead(micPin); // Read the microphone value
+
+    // Print the mic value for debugging
+    Serial.println(micValue);
+
+    // Check if noise level exceeds the threshold
+    if (micValue > threshold && !recording) {
+        Serial.println("Noise detected! Recording...");
+        startRecording();
+    } else if (micValue <= threshold && recording) {
+        Serial.println("Noise level normal. Stopping recording...");
+        stopRecording();
+    }
+
+    delay(100); // Small delay for stability
+}
+
+void startRecording() {
+    recording = true;
+    digitalWrite(recordPin, HIGH); // Start recording
+    delay(5000);                   // Record for 5 seconds
+    digitalWrite(recordPin, LOW);  // Stop recording
+}
+
+void stopRecording() {
+    recording = false;
+    // Here, you can save the recording or play it back
+    digitalWrite(playPin, HIGH);   // Play the recorded audio
+    delay(5000);                   // Play for 5 seconds
+    digitalWrite(playPin, LOW);
+}
+
